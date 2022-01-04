@@ -35,8 +35,11 @@ La tarea consiste en programar el juego <<piedra, papel o tijera>> teniendo en c
 
 1. Deberá responder a las siguientes preguntas al finalizar la prueba:
    1. ¿Cuales fueron los desafíos? 
+   R: Los desafíos presentes son con respecto a realizar el sistema en consola, ya que muy poco lo he hecho con PHP y desde que estudie en la Universidad no hecho ningún sistema en consola, también elegir un praton de diseño adecuado para este juego y las pruebas unitarias a ser implementadas.
    2. ¿Como los resolviste? 
+   R: Elegí el patron creaciónal Singelton y las pruebas unitarias continuando la que ya existía solo valide que se marcara en "y" la opción de jugar con las reglas del juego modificadas.
    3. ¿Por qué lo hiciste de esta manera? 
+   R: Fue la forma más fácil de realizar los requerimientos que solicitaron, ademas queria implementar las reglas de juegos explicadas por sheldon en **The Big Bang Theory**. Por otro lado tome la desición de hacerlo así ya que no se me estableció límite de tiempo, y por motivos de viajes me tarde bastante en iniciar con el desarrollo, quise que vieras mi forma de codificar lo antes posible para no perder la oportunidad de seguir el proceso de selección.
 2. **Solo** se podrá desarrollar en **PHP y consola** 
 3. El código deberá implementar buenas prácticas (como POO, patrones de diseño o código limpio y comentado)
 4. El código deberá ser extensible en el futuro (cambiar el número de rondas máximas, agregar nuevas reglas…)
