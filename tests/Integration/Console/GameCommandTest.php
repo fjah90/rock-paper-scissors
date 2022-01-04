@@ -26,7 +26,10 @@ class GameCommandTest extends IntegrationTestCase
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'command' => $command->getName(),
+            'command' => $command->getName("@TEST1"),
+            //Init the test with The Big Bang Theory rules
+            //(can modifid change the first position in the array and set "y" to Yes and "n" to No, the secod "y" is to hitting ENTER)
+            $commandTester->setInputs(array('y','y')),
         ]);
 
         $output = $commandTester->getDisplay();
