@@ -98,9 +98,8 @@ class GameCommand extends Command
 
         $question_upMaxRound = $this->customConfrimQuestion('Te gustaria cambiar la cantidad maxima de rondas? y/n ', $input, $output);
 
-        if ($question_upMaxRound) {
+        if ($question_upMaxRound)
             $this->max_round = 10;
-        }
 
         do {
             // User selection
@@ -110,27 +109,22 @@ class GameCommand extends Command
             $computer_weapon = $this->selectComputerWepond($output);
 
             $output->writeln('Round: ' .$this->round);
-            $output->writeln($user_weapon);
-            $output->writeln($computer_weapon);
 
             if(!$this->theBigBangTheory){
-                // Result with default rules
                 $this->setResult($user_weapon, $computer_weapon, $output);
             }else{
-                // Result with theBigBangTheory rules
                 $this->setTBBTResult($user_weapon, $computer_weapon, $output);
             }
 
-            if($this->players['player']['stats']['victory'] === $this->maxWins || $this->players['computer']['stats']['victory'] === $this->maxWins){
+            if($this->players['player']['stats']['victory'] === $this->maxWins || $this->players['computer']['stats']['victory'] === $this->maxWins)
                 break;
-            }else{
-                $this->round++;
-            }
+
+            $this->round++;
 
         } while ($this->round <= $this->max_round);
 
         // Display stats
-        $this->displayStats($output);
+        $this->displayStats($output)->render();
 
         return 0;
     }
@@ -143,7 +137,8 @@ class GameCommand extends Command
      * @return void
      */
 
-    protected function setResult($user_weapon, $computer_weapon, $output){
+    protected function setResult($user_weapon, $computer_weapon, $output): void
+    {
 
         if ($this->rules[$user_weapon] === $computer_weapon) {
             $this->players['player']['stats']['victory']++;
@@ -171,27 +166,29 @@ class GameCommand extends Command
      * @return void
      */
 
-    protected function setTBBTResult($user_weapon, $computer_weapon, $output){
-        $empate;
+    protected function setTBBTResult($user_weapon, $computer_weapon, $output): void
+    {
+        $draw;
         foreach ($this->rules as $key => $val) {
-            $empate = false;
-            if (isset($val[$user_weapon]) && $val[$user_weapon] === $computer_weapon) {
-                $this->players['player']['stats']['victory']++;
-                $this->players['computer']['stats']['defeat']++;
+            $draw = false;
+            if (isset($val[$user_weapon]) && $val[$user_weapon] === $computer_weapon){
+                    $this->players['player']['stats']['victory']++;
+                    $this->players['computer']['stats']['defeat']++;
 
-                $output->writeln($this->player_name . ' win!');
-                break;
-            } else if (isset($val[$computer_weapon]) && $val[$computer_weapon] === $user_weapon) {
+                    $output->writeln($this->player_name . ' win!');
+                    break;
+            }else if(isset($val[$computer_weapon]) && $val[$computer_weapon] === $user_weapon){
+
                 $this->players['player']['stats']['defeat']++;
                 $this->players['computer']['stats']['victory']++;
 
                 $output->writeln('Computer win!');
                 break;
-            } else {
-                $empate = true;
+            }else{
+                $draw = true;
             }
         }
-        if($empate){
+        if($draw){
             $this->players['player']['stats']['draw']++;
             $this->players['computer']['stats']['draw']++;
 
@@ -204,12 +201,14 @@ class GameCommand extends Command
      * @param string $question The selected computer weapon
      * @param InputInterface $input InputInterface
      * @param OutputInterface $output OutputInterface
-     * @return boolean
+     * @return bool
      */
 
-    public function customConfrimQuestion($question, $input, $output){
+    public function customConfrimQuestion($question, $input, $output): bool
+    {
         $h = $this->getHelper('question');
         $q = new ConfirmationQuestion($question. PHP_EOL, false, '/^(y|j)/i');
+
         return $h->ask($input, $output, $q);
     }
 
@@ -220,7 +219,8 @@ class GameCommand extends Command
      * @return integer The selected weapon
      */
 
-    public function selectUserWepond($input, $output){
+    public function selectUserWepond($input, $output): int
+    {
         $ask = $this->getHelper('question');
         $question = new ChoiceQuestion('Please select your weapon', array_values($this->weapons), 1);
         $question->setErrorMessage('Weapon %s is invalid.');
@@ -239,7 +239,8 @@ class GameCommand extends Command
      * @return integer The selected weapon
      */
 
-    public function selectComputerWepond($output){
+    public function selectComputerWepond($output): int
+    {
 
         $w = array_rand($this->weapons);
 
@@ -251,10 +252,11 @@ class GameCommand extends Command
     /**
      * Display Final result stats.
      * @param OutputInterface $output OutputInterface
-     * @return render Table Render
+     * @return object Table to Render
      */
 
-    public function displayStats($output){
+    public function displayStats($output): object
+    {
         $s = $this->players;
 
         $s = array_map(function ($p) {
@@ -266,7 +268,7 @@ class GameCommand extends Command
             ->setHeaders(['Jugador', 'Rondas ganadas', 'Rondas empatadas', 'Rondas perdidas'])
             ->setRows($s);
 
-        return $t->render();
+        return $t;
     }
 
 }
