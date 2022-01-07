@@ -77,10 +77,9 @@ class GameCommand extends Command
             ]
         ];
 
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('Te gustaria jugar con las reglas "The Big Bang Theory"? y/n '. PHP_EOL, false, '/^(y|j)/i');
-        
-        if ($helper->ask($input, $output, $question)) {
+        $question_theBigBangTheory = $this->customConfrimQuestion('Te gustaria jugar con las reglas "The Big Bang Theory"? y/n ', $input, $output);
+
+        if ($question_theBigBangTheory) {
             $this->theBigBangTheory = true;
             array_push($this->weapons, 'Lagarto', 'Spock');
             $this->rules = [
@@ -97,23 +96,23 @@ class GameCommand extends Command
             ];
         }
 
-        $question = new ConfirmationQuestion('Te gustaria cambiar la cantidad maxima de rondas? y/n '. PHP_EOL, false, '/^(y|j)/i');
-        $ask = $this->getHelper('question');
+        $question_upMaxRound = $this->customConfrimQuestion('Te gustaria cambiar la cantidad maxima de rondas? y/n ', $input, $output);
+
+        if ($question_upMaxRound) {
+            $this->max_round = 10;
+        }
 
         do {
             // User selection
-            $question = new ChoiceQuestion('Please select your weapon', array_values($this->weapons), 1);
-            $question->setErrorMessage('Weapon %s is invalid.');
-
-            $user_weapon = $ask->ask($input, $output, $question);
-            $output->writeln('Genial! Has seleccionado: ' . $user_weapon);
-            $user_weapon = array_search($user_weapon, $this->weapons);
+            $user_weapon = $this->selectUserWepond($input, $output);
 
             // Computer selection
-            $computer_weapon = array_rand($this->weapons);
+            $computer_weapon = $this->selectComputerWepond($output);
 
-            $output->writeln('Tu oponente a selecionado: ' . $this->weapons[$computer_weapon]);
             $output->writeln('Round: ' .$this->round);
+            $output->writeln($user_weapon);
+            $output->writeln($computer_weapon);
+
             if(!$this->theBigBangTheory){
                 // Result with default rules
                 $this->setResult($user_weapon, $computer_weapon, $output);
@@ -122,7 +121,7 @@ class GameCommand extends Command
                 $this->setTBBTResult($user_weapon, $computer_weapon, $output);
             }
 
-            if($this->players['player']['stats']['victory'] == $this->maxWins || $this->players['computer']['stats']['victory'] == $this->maxWins){
+            if($this->players['player']['stats']['victory'] === $this->maxWins || $this->players['computer']['stats']['victory'] === $this->maxWins){
                 break;
             }else{
                 $this->round++;
@@ -131,18 +130,7 @@ class GameCommand extends Command
         } while ($this->round <= $this->max_round);
 
         // Display stats
-        $stats = $this->players;
-
-        $stats = array_map(function ($player) {
-            return [$player['name'], $player['stats']['victory'], $player['stats']['draw'], $player['stats']['defeat']];
-        }, $stats);
-
-        $table = new Table($output);
-        $table
-            ->setHeaders(['Jugador', 'Rondas ganadas', 'Rondas empatadas', 'Rondas perdidas'])
-            ->setRows($stats);
-
-        $table->render();
+        $this->displayStats($output);
 
         return 0;
     }
@@ -209,6 +197,76 @@ class GameCommand extends Command
 
             $output->writeln('Draw!');
         }
+    }
+
+    /**
+     * Prompt to answer a closed answer.
+     * @param string $question The selected computer weapon
+     * @param InputInterface $input InputInterface
+     * @param OutputInterface $output OutputInterface
+     * @return boolean
+     */
+
+    public function customConfrimQuestion($question, $input, $output){
+        $h = $this->getHelper('question');
+        $q = new ConfirmationQuestion($question. PHP_EOL, false, '/^(y|j)/i');
+        return $h->ask($input, $output, $q);
+    }
+
+    /**
+     * Prompt to select a weapon.
+     * @param InputInterface $input InputInterface
+     * @param OutputInterface $output OutputInterface
+     * @return integer The selected weapon
+     */
+
+    public function selectUserWepond($input, $output){
+        $ask = $this->getHelper('question');
+        $question = new ChoiceQuestion('Please select your weapon', array_values($this->weapons), 1);
+        $question->setErrorMessage('Weapon %s is invalid.');
+
+        $w = $ask->ask($input, $output, $question);
+        $output->writeln('Genial! Has seleccionado: ' . $w);
+
+        $uw = array_search($w, $this->weapons);
+
+        return (int)$uw;
+    }
+
+    /**
+     * Randon Selected Wepond.
+     * @param OutputInterface $output OutputInterface
+     * @return integer The selected weapon
+     */
+
+    public function selectComputerWepond($output){
+
+        $w = array_rand($this->weapons);
+
+        $output->writeln('Tu oponente a selecionado: ' . $this->weapons[$w]);
+
+        return (int)$w;
+    }
+
+    /**
+     * Display Final result stats.
+     * @param OutputInterface $output OutputInterface
+     * @return render Table Render
+     */
+
+    public function displayStats($output){
+        $s = $this->players;
+
+        $s = array_map(function ($p) {
+            return [$p['name'], $p['stats']['victory'], $p['stats']['draw'], $p['stats']['defeat']];
+        }, $s);
+
+        $t = new Table($output);
+        $t
+            ->setHeaders(['Jugador', 'Rondas ganadas', 'Rondas empatadas', 'Rondas perdidas'])
+            ->setRows($s);
+
+        return $t->render();
     }
 
 }
