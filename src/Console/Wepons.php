@@ -4,7 +4,6 @@ namespace Uniqoders\Game\Console;
 
 class Wepons
 {
-
     public $wepons;
 
     public function __contruct($wepons = []): void

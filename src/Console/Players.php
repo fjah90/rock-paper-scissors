@@ -43,8 +43,8 @@ class Players
 
     public function setDraw(): void
     {
-        foreach ($this->players as $key => $item ) {
-            $this->players[$key]['stats']['draw']++;
+        foreach ($this->players as $id => $player ) {
+            $this->players[$id]['stats']['draw']++;
         }
     }
 
